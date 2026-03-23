@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Countdown Timer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            touch-action: manipulation;
+        }
+
+        .split-container {
+            display: flex;
+            flex-direction: row;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .side {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 3vh;
+            background-color: #f0f0f0;
+            transition: background-color 0.3s ease;
+        }
+
+        .side.running {
+            background-color: #4CAF50;
+        }
+
+        .side.warning {
+            background-color: #FFC107;
+        }
+
+        .side.critical {
+            background-color: #F44336;
+        }
+
+        .counter-section {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 3vh;
+        }
+
+        .button {
+            width: 12vh;
+            height: 12vh;
+            font-size: 6vh;
+            border: none;
+            border-radius: 50%;
+            background-color: #2196F3;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .button:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .display {
+            font-size: 16vh;
+            font-weight: bold;
+            color: #333;
+            min-width: 20vh;
+            text-align: center;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .chooseBtn {
+            padding: 2.5vh 4vh;
+            font-size: 5vh;
+            border-radius: 2vh;
+            background-color: #FF9800;
+            margin-top: 2vh;
+            display: inline-flex;
+            gap: 1.5vh;
+            align-items: center;
+            justify-content: center;
+            width: auto;
+            border: none;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .chooseBtn:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .button-icon {
+            font-size: 5vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .button-icon.square {
+            font-size: 6.5vh;
+        }
+
+        .button-label {
+            font-size: 5vh;
+            font-weight: 600;
+        }
+
+        .time-input {
+            padding: 1vh 2vh;
+            font-size: 3vh;
+            border: 2px solid #2196F3;
+            border-radius: 1vh;
+            background-color: white;
+            color: #333;
+            text-align: center;
+            width: 10vh;
+            font-weight: 600;
+            margin-top: 1vh;
+        }
+
+        .time-input:focus {
+            outline: none;
+            border-color: #FF9800;
+        }
+
+        .time-input:disabled {
+            background-color: #f0f0f0;
+            border-color: #ccc;
+        }
+
+        .input-label {
+            font-size: 2.5vh;
+            color: #666;
+            margin-top: 0.5vh;
+        }
+
+        .interval-control {
+            position: absolute;
+            top: 2vh;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 3vh;
+            z-index: 10;
+        }
+
+        .interval-control.hidden {
+            display: none;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .interval-input {
+            padding: 1vh 2vh;
+            font-size: 3vh;
+            border: 2px solid #2196F3;
+            border-radius: 1vh;
+            background-color: white;
+            color: #333;
+            text-align: center;
+            width: 12vh;
+            font-weight: 600;
+        }
+
+        .interval-input:focus {
+            outline: none;
+            border-color: #FF9800;
+        }
+
+        .interval-label {
+            font-size: 2.5vh;
+            color: #666;
+            margin-bottom: 0.5vh;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 0.5vh 1vh;
+            border-radius: 0.5vh;
+        }
+
+        /* Portrait mode - stack vertically */
+        @media screen and (orientation: portrait) {
+            .split-container {
+                flex-direction: column;
+            }
+            
+            .button {
+                width: 18vw;
+                height: 18vw;
+                font-size: 9vw;
+            }
+            
+            .display {
+                font-size: 22vw;
+                min-width: 30vw;
+            }
+            
+            .counter-section {
+                gap: 4vw;
+            }
+            
+            .side {
+                gap: 4vw;
+            }
+            
+            .chooseBtn {
+                padding: 3vw 6vw;
+                font-size: 6vw;
+                gap: 2vw;
+            }
+            
+            .button-icon {
+                font-size: 6vw;
+            }
+            
+            .button-icon.square {
+                font-size: 8vw;
+            }
+            
+            .button-label {
+                font-size: 6vw;
+            }
+
+            .time-input {
+                padding: 2vw 4vw;
+                font-size: 5vw;
+                width: 15vw;
+                margin-top: 2vw;
+            }
+
+            .input-label {
+                font-size: 4vw;
+                margin-top: 1vw;
+            }
+
+            .interval-control {
+                top: 2vw;
+                flex-direction: column;
+                gap: 2vw;
+            }
+
+            .control-group {
+                width: 100%;
+            }
+
+            .interval-input {
+                padding: 2vw 4vw;
+                font-size: 5vw;
+                width: 20vw;
+            }
+
+            .interval-label {
+                font-size: 4vw;
+                margin-bottom: 1vw;
+                padding: 1vw 2vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Interval Control -->
+    <div class="interval-control">
+        <div class="control-group">
+            <label class="interval-label" for="intervalInput">Interval (seconds)</label>
+            <input type="number" class="interval-input" id="intervalInput" min="1" max="999" value="10" aria-label="Set countdown interval">
+        </div>
+        <div class="control-group">
+            <label class="interval-label" for="warningInput">Warning (%)</label>
+            <input type="number" class="interval-input" id="warningInput" min="0" max="100" value="25" aria-label="Set warning percentage">
+        </div>
+    </div>
+
+    <div class="split-container">
+        <!-- Left Side -->
+        <div class="side" id="leftSide">
+            <div class="counter-section">
+                <button class="button" id="leftUpBtn" aria-label="Increase left counter">▲</button>
+                <div class="display" id="leftDisplay">3</div>
+                <button class="button" id="leftDownBtn" aria-label="Decrease left counter">▼</button>
+            </div>
+            <button class="button chooseBtn" id="leftChooseBtn" aria-label="Start left countdown">
+                <span class="button-icon">▶</span>
+                <span class="button-label">START</span>
+            </button>
+        </div>
+
+        <!-- Right Side -->
+        <div class="side" id="rightSide">
+            <div class="counter-section">
+                <button class="button" id="rightUpBtn" aria-label="Increase right counter">▲</button>
+                <div class="display" id="rightDisplay">3</div>
+                <button class="button" id="rightDownBtn" aria-label="Decrease right counter">▼</button>
+            </div>
+            <button class="button chooseBtn" id="rightChooseBtn" aria-label="Start right countdown">
+                <span class="button-icon">▶</span>
+                <span class="button-label">START</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Parse URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlInterval = parseInt(urlParams.get('interval')) || 10; // interval in seconds
+        const urlWarning = parseInt(urlParams.get('warning')) || 25; // warning percentage
+        const hideControls = urlParams.get('hide') === 'true'; // hide control inputs
+
+        // Configuration - easy to change
+        const CONFIG = {
+            COUNTDOWN_INTERVAL: urlInterval * 1000,  // Convert seconds to milliseconds
+            WARNING_PERCENT: urlWarning,             // Show yellow at this % remaining
+            INITIAL_VALUE: 3             // Starting counter value
+        };
+
+        const COLORS = {
+            NORMAL: '#f0f0f0',   // Gray
+            WARNING: '#FFC107',  // Yellow/amber
+            CRITICAL: '#F44336'  // Red
+        };
+
+        // Counter state for each side
+        const state = {
+            left: { 
+                counter: CONFIG.INITIAL_VALUE, 
+                initialValue: CONFIG.INITIAL_VALUE,
+                isRunning: false,
+                intervalId: null
+            },
+            right: { 
+                counter: CONFIG.INITIAL_VALUE,
+                initialValue: CONFIG.INITIAL_VALUE,
+                isRunning: false,
+                intervalId: null
+            }
+        };
+
+        // Get elements for both sides
+        const elements = {
+            left: {
+                side: document.getElementById('leftSide'),
+                display: document.getElementById('leftDisplay'),
+                upBtn: document.getElementById('leftUpBtn'),
+                downBtn: document.getElementById('leftDownBtn'),
+                chooseBtn: document.getElementById('leftChooseBtn'),
+                icon: document.querySelector('#leftChooseBtn .button-icon'),
+                label: document.querySelector('#leftChooseBtn .button-label')
+            },
+            right: {
+                side: document.getElementById('rightSide'),
+                display: document.getElementById('rightDisplay'),
+                upBtn: document.getElementById('rightUpBtn'),
+                downBtn: document.getElementById('rightDownBtn'),
+                chooseBtn: document.getElementById('rightChooseBtn'),
+                icon: document.querySelector('#rightChooseBtn .button-icon'),
+                label: document.querySelector('#rightChooseBtn .button-label')
+            }
+        };
+
+        const intervalInput = document.getElementById('intervalInput');
+        intervalInput.value = urlInterval;
+        
+        const warningInput = document.getElementById('warningInput');
+        warningInput.value = urlWarning;
+
+        const intervalControl = document.querySelector('.interval-control');
+        if (hideControls) {
+            intervalControl.classList.add('hidden');
+        }
+
+        function updateDisplay(side) {
+            const el = elements[side];
+            const st = state[side];
+            el.display.textContent = st.counter;
+            el.downBtn.disabled = st.counter === 0 || st.isRunning;
+            el.upBtn.disabled = st.isRunning;
+        }
+
+        function updateBackground(side) {
+            const el = elements[side];
+            const st = state[side];
+            
+            // Calculate warning threshold (25% of initial value, rounded up)
+            const warningThreshold = Math.ceil(st.initialValue * (CONFIG.WARNING_PERCENT / 100));
+            
+            // Remove all color classes
+            el.side.classList.remove('running', 'warning', 'critical');
+            
+            // Apply appropriate color based on counter value
+            if (st.counter === 0) {
+                el.side.classList.add('critical');  // Red
+            } else if (st.counter <= warningThreshold && st.isRunning) {
+                el.side.classList.add('warning');   // Yellow
+            } else if (st.isRunning) {
+                el.side.classList.add('running');   // Green
+            }
+            // Otherwise stays normal gray (no class)
+        }
+
+        function increment(side) {
+            const st = state[side];
+            if (!st.isRunning) {
+                st.initialValue++;
+                st.counter = st.initialValue;
+                updateDisplay(side);
+            }
+        }
+
+        function decrement(side) {
+            const st = state[side];
+            if (!st.isRunning && st.initialValue > 0) {
+                st.initialValue--;
+                st.counter = st.initialValue;
+                updateDisplay(side);
+            }
+        }
+
+        function tick(side) {
+            const st = state[side];
+            
+            if (st.counter > 0) {
+                st.counter--;
+                updateDisplay(side);
+                updateBackground(side);
+                
+                // Stop at zero
+                if (st.counter === 0) {
+                    stopCountdown(side);
+                    updateButtonState(side, 'reset');
+                }
+            }
+        }
+
+        function startCountdown(side) {
+            const st = state[side];
+            
+            if (!st.isRunning && st.counter > 0) {
+                st.isRunning = true;
+                updateButtonState(side, 'stop');
+                updateBackground(side);
+                updateDisplay(side);
+                
+                // Get current interval from input
+                const currentInterval = parseInt(intervalInput.value) * 1000 || CONFIG.COUNTDOWN_INTERVAL;
+                
+                // Start interval
+                st.intervalId = setInterval(() => tick(side), currentInterval);
+            }
+        }
+
+        function stopCountdown(side) {
+            const st = state[side];
+            
+            if (st.intervalId) {
+                clearInterval(st.intervalId);
+                st.intervalId = null;
+            }
+            st.isRunning = false;
+            updateDisplay(side);
+        }
+
+        function resetCountdown(side) {
+            const el = elements[side];
+            const st = state[side];
+            
+            stopCountdown(side);
+            st.counter = st.initialValue;
+            updateDisplay(side);
+            updateBackground(side);
+            updateButtonState(side, 'start');
+        }
+
+        function updateButtonState(side, mode) {
+            const el = elements[side];
+            
+            if (mode === 'start') {
+                el.icon.classList.remove('square');
+                el.icon.textContent = '▶';
+                el.label.textContent = 'START';
+            } else if (mode === 'stop') {
+                el.icon.classList.add('square');
+                el.icon.textContent = '■';
+                el.label.textContent = 'STOP';
+            } else if (mode === 'reset') {
+                el.icon.classList.add('square');
+                el.icon.textContent = '■';
+                el.label.textContent = 'RESET';
+            }
+        }
+
+        function choose(side) {
+            const st = state[side];
+
+            if (st.counter === 0) {
+                // At zero - reset
+                resetCountdown(side);
+            } else if (st.isRunning) {
+                // Running - stop
+                stopCountdown(side);
+                updateButtonState(side, 'start');
+            } else {
+                // Not running - start
+                startCountdown(side);
+            }
+        }
+
+        // Add event listeners for left side
+        elements.left.upBtn.addEventListener('click', () => increment('left'));
+        elements.left.downBtn.addEventListener('click', () => decrement('left'));
+        elements.left.chooseBtn.addEventListener('click', () => choose('left'));
+
+        // Add event listeners for right side
+        elements.right.upBtn.addEventListener('click', () => increment('right'));
+        elements.right.downBtn.addEventListener('click', () => decrement('right'));
+        elements.right.chooseBtn.addEventListener('click', () => choose('right'));
+
+        // Interval input change
+        intervalInput.addEventListener('change', (e) => {
+            const value = parseInt(e.target.value) || 10;
+            if (value >= 1) {
+                intervalInput.value = value;
+                CONFIG.COUNTDOWN_INTERVAL = value * 1000;
+            }
+        });
+
+        // Warning percentage input change
+        warningInput.addEventListener('change', (e) => {
+            const value = parseInt(e.target.value);
+            if (value >= 0 && value <= 100) {
+                warningInput.value = value;
+                CONFIG.WARNING_PERCENT = value;
+                // Update background colors for both sides if running
+                if (state.left.isRunning) updateBackground('left');
+                if (state.right.isRunning) updateBackground('right');
+            }
+        });
+
+        // Prevent double-tap zoom on buttons
+        document.querySelectorAll('.button, .chooseBtn').forEach(button => {
+            button.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                button.click();
+            });
+        });
+
+        // Initialize both displays
+        updateDisplay('left');
+        updateDisplay('right');
+    </script>
+</body>
+</html>

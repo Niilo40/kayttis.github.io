@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Mobile Counter</title>
+    <title>Split Counter</title>
     <style>
         * {
             margin: 0;
@@ -16,39 +16,45 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background-color: #f0f0f0;
-            transition: background-color 0.3s ease;
             overflow: hidden;
             width: 100vw;
             height: 100vh;
             touch-action: manipulation;
         }
 
-        body.active {
-            background-color: #4CAF50;
+        .split-container {
+            display: flex;
+            flex-direction: row;
+            width: 100vw;
+            height: 100vh;
         }
 
-        .container {
+        .side {
+            flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            width: 100vw;
             gap: 3vh;
+            background-color: #f0f0f0;
+            transition: background-color 0.3s ease;
+        }
+
+        .side.active {
+            background-color: #4CAF50;
         }
 
         .counter-section {
             display: flex;
             flex-direction: row;
             align-items: center;
-            gap: 4vh;
+            gap: 3vh;
         }
 
         .button {
-            width: 15vh;
-            height: 15vh;
-            font-size: 8vh;
+            width: 12vh;
+            height: 12vh;
+            font-size: 6vh;
             border: none;
             border-radius: 50%;
             background-color: #2196F3;
@@ -74,19 +80,19 @@
             opacity: 0.6;
         }
 
-        #display {
-            font-size: 20vh;
+        .display {
+            font-size: 16vh;
             font-weight: bold;
             color: #333;
-            min-width: 30vh;
+            min-width: 20vh;
             text-align: center;
             user-select: none;
             -webkit-user-select: none;
         }
 
-        #chooseBtn {
-            padding: 3vh 5vh;
-            font-size: 6vh;
+        .chooseBtn {
+            padding: 2.5vh 4vh;
+            font-size: 5vh;
             border-radius: 2vh;
             background-color: #FF9800;
             margin-top: 2vh;
@@ -95,150 +101,202 @@
             align-items: center;
             justify-content: center;
             width: auto;
+            border: none;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
-        #chooseBtn:disabled {
-            background-color: #cccccc;
+        .chooseBtn:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .button-icon {
-            font-size: 6vh;
+            font-size: 5vh;
             display: flex;
             align-items: center;
             justify-content: center;
         }
         
         .button-icon.square {
-            font-size: 8vh;
+            font-size: 6.5vh;
         }
 
         .button-label {
-            font-size: 6vh;
+            font-size: 5vh;
             font-weight: 600;
         }
 
-        /* Landscape optimization */
-        @media screen and (orientation: landscape) {
-            .container {
-                gap: 2vh;
+        /* Portrait mode - stack vertically */
+        @media screen and (orientation: portrait) {
+            .split-container {
+                flex-direction: column;
+            }
+            
+            .button {
+                width: 18vw;
+                height: 18vw;
+                font-size: 9vw;
+            }
+            
+            .display {
+                font-size: 22vw;
+                min-width: 30vw;
             }
             
             .counter-section {
-                gap: 3vh;
+                gap: 4vw;
             }
             
-            #display {
-                font-size: 18vh;
-            }
-        }
-
-        /* Portrait fallback */
-        @media screen and (orientation: portrait) {
-            .button {
-                width: 20vw;
-                height: 20vw;
-                font-size: 10vw;
+            .side {
+                gap: 4vw;
             }
             
-            #display {
-                font-size: 25vw;
-            }
-            
-            #chooseBtn {
-                padding: 4vw 8vw;
-                font-size: 7vw;
+            .chooseBtn {
+                padding: 3vw 6vw;
+                font-size: 6vw;
                 gap: 2vw;
             }
             
             .button-icon {
-                font-size: 7vw;
+                font-size: 6vw;
             }
             
             .button-icon.square {
-                font-size: 9vw;
+                font-size: 8vw;
             }
             
             .button-label {
-                font-size: 7vw;
+                font-size: 6vw;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="counter-section">
-            <button class="button" id="upBtn" aria-label="Increase counter">▲</button>
-            <div id="display">3</div>
-            <button class="button" id="downBtn" aria-label="Decrease counter">▼</button>
+    <div class="split-container">
+        <!-- Left Side -->
+        <div class="side" id="leftSide">
+            <div class="counter-section">
+                <button class="button" id="leftUpBtn" aria-label="Increase left counter">▲</button>
+                <div class="display" id="leftDisplay">3</div>
+                <button class="button" id="leftDownBtn" aria-label="Decrease left counter">▼</button>
+            </div>
+            <button class="button chooseBtn" id="leftChooseBtn" aria-label="Choose left">
+                <span class="button-icon">▶</span>
+                <span class="button-label">CHOOSE</span>
+            </button>
         </div>
-        <button class="button" id="chooseBtn" aria-label="Choose and reset">
-            <span class="button-icon">▶</span>
-            <span class="button-label">CHOOSE</span>
-        </button>
+
+        <!-- Right Side -->
+        <div class="side" id="rightSide">
+            <div class="counter-section">
+                <button class="button" id="rightUpBtn" aria-label="Increase right counter">▲</button>
+                <div class="display" id="rightDisplay">3</div>
+                <button class="button" id="rightDownBtn" aria-label="Decrease right counter">▼</button>
+            </div>
+            <button class="button chooseBtn" id="rightChooseBtn" aria-label="Choose right">
+                <span class="button-icon">▶</span>
+                <span class="button-label">CHOOSE</span>
+            </button>
+        </div>
     </div>
 
     <script>
-        let counter = 3;
-        let isSelected = false;
+        // Counter state for each side
+        const state = {
+            left: { counter: 3, isSelected: false },
+            right: { counter: 3, isSelected: false }
+        };
 
-        const display = document.getElementById('display');
-        const upBtn = document.getElementById('upBtn');
-        const downBtn = document.getElementById('downBtn');
-        const chooseBtn = document.getElementById('chooseBtn');
-        const chooseIcon = chooseBtn.querySelector('.button-icon');
-        const chooseLabel = chooseBtn.querySelector('.button-label');
+        // Get elements for both sides
+        const elements = {
+            left: {
+                side: document.getElementById('leftSide'),
+                display: document.getElementById('leftDisplay'),
+                upBtn: document.getElementById('leftUpBtn'),
+                downBtn: document.getElementById('leftDownBtn'),
+                chooseBtn: document.getElementById('leftChooseBtn'),
+                icon: document.querySelector('#leftChooseBtn .button-icon'),
+                label: document.querySelector('#leftChooseBtn .button-label')
+            },
+            right: {
+                side: document.getElementById('rightSide'),
+                display: document.getElementById('rightDisplay'),
+                upBtn: document.getElementById('rightUpBtn'),
+                downBtn: document.getElementById('rightDownBtn'),
+                chooseBtn: document.getElementById('rightChooseBtn'),
+                icon: document.querySelector('#rightChooseBtn .button-icon'),
+                label: document.querySelector('#rightChooseBtn .button-label')
+            }
+        };
 
-        function updateDisplay() {
-            display.textContent = counter;
-            downBtn.disabled = counter === 0;
+        function updateDisplay(side) {
+            const el = elements[side];
+            const st = state[side];
+            el.display.textContent = st.counter;
+            el.downBtn.disabled = st.counter === 0;
         }
 
-        function increment() {
-            counter++;
-            updateDisplay();
+        function increment(side) {
+            state[side].counter++;
+            updateDisplay(side);
         }
 
-        function decrement() {
-            if (counter > 0) {
-                counter--;
-                updateDisplay();
+        function decrement(side) {
+            if (state[side].counter > 0) {
+                state[side].counter--;
+                updateDisplay(side);
             }
         }
 
-        function choose() {
-            if (isSelected) {
+        function choose(side) {
+            const el = elements[side];
+            const st = state[side];
+
+            if (st.isSelected) {
                 // Deselect: remove green and reset
-                document.body.classList.remove('active');
-                chooseIcon.classList.remove('square');
-                chooseIcon.textContent = '▶';
-                chooseLabel.textContent = 'CHOOSE';
-                counter = 3;
-                updateDisplay();
-                isSelected = false;
+                el.side.classList.remove('active');
+                el.icon.classList.remove('square');
+                el.icon.textContent = '▶';
+                el.label.textContent = 'CHOOSE';
+                st.counter = 3;
+                updateDisplay(side);
+                st.isSelected = false;
             } else {
                 // Select: turn green and change to square
-                document.body.classList.add('active');
-                chooseIcon.classList.add('square');
-                chooseIcon.textContent = '■';
-                chooseLabel.textContent = 'CHOSEN';
-                isSelected = true;
+                el.side.classList.add('active');
+                el.icon.classList.add('square');
+                el.icon.textContent = '■';
+                el.label.textContent = 'CHOSEN';
+                st.isSelected = true;
             }
         }
 
-        upBtn.addEventListener('click', increment);
-        downBtn.addEventListener('click', decrement);
-        chooseBtn.addEventListener('click', choose);
+        // Add event listeners for left side
+        elements.left.upBtn.addEventListener('click', () => increment('left'));
+        elements.left.downBtn.addEventListener('click', () => decrement('left'));
+        elements.left.chooseBtn.addEventListener('click', () => choose('left'));
+
+        // Add event listeners for right side
+        elements.right.upBtn.addEventListener('click', () => increment('right'));
+        elements.right.downBtn.addEventListener('click', () => decrement('right'));
+        elements.right.chooseBtn.addEventListener('click', () => choose('right'));
 
         // Prevent double-tap zoom on buttons
-        document.querySelectorAll('.button').forEach(button => {
+        document.querySelectorAll('.button, .chooseBtn').forEach(button => {
             button.addEventListener('touchend', (e) => {
                 e.preventDefault();
                 button.click();
             });
         });
 
-        // Initialize
-        updateDisplay();
+        // Initialize both displays
+        updateDisplay('left');
+        updateDisplay('right');
     </script>
 </body>
 </html>
