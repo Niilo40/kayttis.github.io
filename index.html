@@ -85,22 +85,35 @@
         }
 
         #chooseBtn {
-            width: 25vh;
-            height: 12vh;
+            padding: 3vh 5vh;
             font-size: 6vh;
             border-radius: 2vh;
             background-color: #FF9800;
             margin-top: 2vh;
-            display: flex;
+            display: inline-flex;
             gap: 1.5vh;
+            align-items: center;
+            justify-content: center;
+            width: auto;
         }
 
         #chooseBtn:disabled {
             background-color: #cccccc;
         }
 
+        .button-icon {
+            font-size: 6vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .button-icon.square {
+            font-size: 8vh;
+        }
+
         .button-label {
-            font-size: 4vh;
+            font-size: 6vh;
             font-weight: 600;
         }
 
@@ -132,13 +145,21 @@
             }
             
             #chooseBtn {
-                width: 40vw;
-                height: 15vw;
+                padding: 4vw 8vw;
+                font-size: 7vw;
+                gap: 2vw;
+            }
+            
+            .button-icon {
                 font-size: 7vw;
             }
             
+            .button-icon.square {
+                font-size: 9vw;
+            }
+            
             .button-label {
-                font-size: 5vw;
+                font-size: 7vw;
             }
         }
     </style>
@@ -151,19 +172,21 @@
             <button class="button" id="downBtn" aria-label="Decrease counter">▼</button>
         </div>
         <button class="button" id="chooseBtn" aria-label="Choose and reset">
-            <span>▶</span>
+            <span class="button-icon">▶</span>
             <span class="button-label">CHOOSE</span>
         </button>
     </div>
 
     <script>
         let counter = 3;
-        let isAnimating = false;
+        let isSelected = false;
 
         const display = document.getElementById('display');
         const upBtn = document.getElementById('upBtn');
         const downBtn = document.getElementById('downBtn');
         const chooseBtn = document.getElementById('chooseBtn');
+        const chooseIcon = chooseBtn.querySelector('.button-icon');
+        const chooseLabel = chooseBtn.querySelector('.button-label');
 
         function updateDisplay() {
             display.textContent = counter;
@@ -183,20 +206,23 @@
         }
 
         function choose() {
-            if (isAnimating) return;
-            
-            isAnimating = true;
-            chooseBtn.disabled = true;
-            
-            document.body.classList.add('active');
-            
-            setTimeout(() => {
+            if (isSelected) {
+                // Deselect: remove green and reset
                 document.body.classList.remove('active');
+                chooseIcon.classList.remove('square');
+                chooseIcon.textContent = '▶';
+                chooseLabel.textContent = 'CHOOSE';
                 counter = 3;
                 updateDisplay();
-                isAnimating = false;
-                chooseBtn.disabled = false;
-            }, 2000);
+                isSelected = false;
+            } else {
+                // Select: turn green and change to square
+                document.body.classList.add('active');
+                chooseIcon.classList.add('square');
+                chooseIcon.textContent = '■';
+                chooseLabel.textContent = 'CHOSEN';
+                isSelected = true;
+            }
         }
 
         upBtn.addEventListener('click', increment);
