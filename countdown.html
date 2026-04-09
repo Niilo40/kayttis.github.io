@@ -339,15 +339,19 @@
     <script>
         // Parse URL parameters
         const urlParams = new URLSearchParams(window.location.search);
-        const urlInterval = parseInt(urlParams.get('interval')) || 10; // interval in seconds
-        const urlWarning = parseInt(urlParams.get('warning')) || 25; // warning percentage
+        const urlIntervalRaw = parseInt(urlParams.get('interval'), 10);
+        const urlWarningRaw = parseInt(urlParams.get('warning'), 10);
+        const urlInputRaw = parseInt(urlParams.get('input'), 10);
+        const urlInterval = Number.isInteger(urlIntervalRaw) && urlIntervalRaw >= 1 ? urlIntervalRaw : 10; // interval in seconds
+        const urlWarning = Number.isInteger(urlWarningRaw) && urlWarningRaw >= 0 && urlWarningRaw <= 100 ? urlWarningRaw : 25; // warning percentage
+        const urlInput = Number.isInteger(urlInputRaw) && urlInputRaw >= 0 ? urlInputRaw : 3; // starting counter value
         const hideControls = urlParams.get('hide') === 'true'; // hide control inputs
 
         // Configuration - easy to change
         const CONFIG = {
             COUNTDOWN_INTERVAL: urlInterval * 1000,  // Convert seconds to milliseconds
             WARNING_PERCENT: urlWarning,             // Show yellow at this % remaining
-            INITIAL_VALUE: 3             // Starting counter value
+            INITIAL_VALUE: urlInput             // Starting counter value
         };
 
         const COLORS = {

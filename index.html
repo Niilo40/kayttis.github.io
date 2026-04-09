@@ -206,10 +206,15 @@
     </div>
 
     <script>
+        // Parse URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlInputRaw = parseInt(urlParams.get('input'), 10);
+        const initialValue = Number.isInteger(urlInputRaw) && urlInputRaw >= 0 ? urlInputRaw : 3;
+
         // Counter state for each side
         const state = {
-            left: { counter: 3, isSelected: false },
-            right: { counter: 3, isSelected: false }
+            left: { counter: initialValue, isSelected: false },
+            right: { counter: initialValue, isSelected: false }
         };
 
         // Get elements for both sides
@@ -263,7 +268,7 @@
                 el.icon.classList.remove('square');
                 el.icon.textContent = '▶';
                 el.label.textContent = 'CHOOSE';
-                st.counter = 3;
+                st.counter = initialValue;
                 updateDisplay(side);
                 st.isSelected = false;
             } else {
